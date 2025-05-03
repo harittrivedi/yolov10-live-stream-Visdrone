@@ -1,0 +1,46 @@
+# Dockerfile for YOLOv10 + Live Webcam + Flask Streaming
+# Works on NVIDIA GPU-enabled systems
+
+FROM python:3.10-slim
+
+# ----------------------------------
+# 1. SYSTEM PREP
+# ----------------------------------
+RUN apt-get update && apt-get install -y \
+    ffmpeg libsm6 libxext6 \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libgtk2.0-dev \
+    libgtk-3-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    wget unzip git && \
+    rm -rf /var/lib/apt/lists/*
+
+# ----------------------------------
+# 2. WORKDIR
+# ----------------------------------
+WORKDIR /app
+
+# ----------------------------------
+# 3. COPY FILES
+# ----------------------------------
+COPY requirements.txt requirements.txt
+COPY best.pt best.pt
+COPY app.py app.py
+
+# ----------------------------------
+# 4. INSTALL DEPENDENCIES
+# ----------------------------------
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# ----------------------------------
+# 5. EXPOSE PORT
+# ----------------------------------
+EXPOSE 5000
+
+# ----------------------------------
+# 6. ENTRYPOINT
+# ----------------------------------
+CMD ["python", "app.py"]
